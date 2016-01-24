@@ -7,7 +7,7 @@ require_once("class.helpers.php");
 
 class Battle
 {
-	function Battle($battle)
+	function __construct($battle)
 	{
 		$this->involved_ = 0;
 		$this->ctr_id_ = $battle['id'];
@@ -19,7 +19,7 @@ class Battle
 		$this->ctr_ended_ = $battle['end'];
 		$this->executed_ = False;
                 
-                $this->ownerPilotIdsInvolved_ = $battle["ownerPilotIds"];
+        $this->ownerPilotIdsInvolved_ = $battle["ownerPilotIds"];
 
 		$this->klist_ = new KillList();
 		$this->llist_ = new KillList();
@@ -354,7 +354,7 @@ class Battle
 class BattleList
 {
     
-	function BattleList($system=0)
+	function __construct($system=0)
 	{
 		$this->qry_ = new DBQuery();
 		$this->battles_ = array();
@@ -608,7 +608,7 @@ class BattleListTable
         
         
         
-	function BattleListTable($contractlist)
+	function __construct($contractlist)
 	{
 		$this->contractlist_ = $contractlist;
 		$this->inv_all_time = 0;

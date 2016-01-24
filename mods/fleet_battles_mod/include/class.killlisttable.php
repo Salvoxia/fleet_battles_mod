@@ -5,7 +5,7 @@ if ( !class_exists('KillListTable') )
 {
 class KillListTable
 {
-    function KillListTable($kill_list)
+    function __construct($kill_list)
     {
         $this->limit = 0;
         $this->offset = 0;

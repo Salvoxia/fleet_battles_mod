@@ -10,7 +10,7 @@ class AwardBoxLong
 	/**
 	 * Create an AwardBox from the given TopList and descriptions.
 	 */
-	function AwardBoxLong($list, $title, $comment, $entity, $award, $length = 15)
+	function __construct($list, $title, $comment, $entity, $award, $length = 15)
 	{
 		$this->toplist_ = $list;
 		$this->title_ = $title;
