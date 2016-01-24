@@ -56,7 +56,7 @@
             onmouseover="this.className='kb-table-row-hover';" onClick="window.location.href='?a=kill_detail&kll_id={$k.id}';">
 
         <td width="32" align="center"><img src="{$k.victimshipimage}" border="0" width="32" heigth="32"></td>
-        <td height="32" width="140" valign="middle"><div class="kb-shiptype"><b>{$k.victimshipname}</b><br>{$k.victimshipclass}</div><div class="kb-shipicon"><img src="{$k.victimshipindicator}" border="0"></div></td>
+        <td height="32" width="140" valign="middle"><div class="kb-shiptype"><b>{$k.victimshipname}</b><br>{if !$killlist_iskloss}{$k.victimshipclass}{else}{$k.victimiskloss}{/if}</div><div class="kb-shipicon"><img src="{$k.victimshipindicator}" border="0"></div></td>
         <td width="32" align="center"><img src="{$k.victimportrait}" border="0" width="32" heigth="32"></td>
         {if $config->get('killlist_alogo')}
             {if $k.allianceexists}
