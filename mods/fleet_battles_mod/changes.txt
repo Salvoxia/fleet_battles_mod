@@ -1,13 +1,4 @@
-# fleet\_battles\_mod
-FleetBattles Mod for Eve Development Killboard
-
-##Installation
-Upload the cron and mods folder to your killboard directory. The cron folder contains a Cron Job for building the fleet battles cache, the mods folder contains the actual mod.
-Activate and configure the mod in ACP -> modules.
-
-##Changelog
-
-#####Version 0.2.1 (2012/09/15)
+2012/09/15
 * release of version 0.2.1
 * improved compatibility to various javascript libraries/frameworks
 * ship class listing in balance of power can now be customized per ship class via css-classes (see css/style.css)
@@ -21,7 +12,7 @@ Activate and configure the mod in ACP -> modules.
 * files added: js\toggleFilter.js; template\battlelisttable_filter.tpl; template\battlelisttable_stats.tpl
 * files removed: js\fleetBattles.js.js; .htaccess
 
-#####Version 0.2 (2012/04/01)
+2012/04/01
 * release of version 0.2
 * added possibility for admins to manuall asside sides for involved parties of a battle
 * style-upgrade for Balance Of Power table
@@ -31,7 +22,7 @@ Activate and configure the mod in ACP -> modules.
 * fixed a bug in the way fleet battles are determined, please rebuild your fleet battle cache
 
 
-#####Version 0.1.3 (2012/03/23)
+2012/03/23
 * release of version 0.1.3
 * complete code refactoring on the base of kill_related.php in EDK 4.0.4
 * added kill lists tab
@@ -45,23 +36,23 @@ Activate and configure the mod in ACP -> modules.
 
 Removed File: js/toggle.js
 
-#####Version 0.1.2 (2012/03/13)
+2012/03/13
 * release of version 0.1.2
 * includes now a cronjob for automatic updating the fleet battles cache
 * fixed minor bugs
 
-#####Version 0.1.1 (2012/03/11)
+2012/03/11
 * release of version 0.1.1
 * destroyed indicator (red background) is now defined by the class .br-destroyed (defined in css/style.css)
 * added "include adjacent" functionality (not (yet) available for fleet battle displaying, only for related kills atm)
 * fixed displaying of pod images in battle overview
 
-#####2012/03/11
+2012/03/11
 * added support for simple urls
 * fixed a wrong linkage in Battle Overview
 
-#####2012/03/10
+2012/03/10
 * fixed bug preventing map images in battle overview from displaying
 
-#####2012/03/10
+2012/03/10
 * initial version
