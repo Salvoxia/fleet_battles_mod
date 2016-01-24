@@ -1,11 +1,33 @@
 # fleet\_battles\_mod
-FleetBattles Mod for Eve Development Killboard
+FleetBattles Mod for [Eve Development Killboard] (https://github.com/evekb/evedev-kb)
 
 ##Installation
 Upload the cron and mods folder to your killboard directory. The cron folder contains a Cron Job for building the fleet battles cache, the mods folder contains the actual mod.
-Activate and configure the mod in ACP -> modules.
+Activate and configure the mod in ACP -> Modules.
 
 ##Changelog
+
+
+#####Version 0.2.2 (2016/??/??)
+* release of version 0.2.2
+* fixes for compatibility with PHP 7
+* added a top list showing the killboard owner's top fleet battle attendees to the Fleet Battles Overview page
+ * Upgrade option 1: Delete and re-add your cache table (and then re-build your cache, which might take VERY long)
+ * Upgrade option 2: Execute the following SQL script on your killboard's database:
+```sql
+CREATE TABLE `kb3_battles_owner_pilots` (
+    `battle_id` int unsigned NOT NULL,
+    `plt_id` int unsigned NOT NULL,
+    PRIMARY KEY (`battle_id`, `plt_id`)
+) ENGINE=InnoDB"
+```
+* added option to manually set start- and end-time when showing related kills (no GUI support yet):
+ * add GET argument starttime to specify the start time, e.g. ```&starttime=2016-01-01 00:05:00```
+ * add GET argument endtime to specify the end time, eg ```&endtime=2016-01-01 00:10:00```
+* Seconds portion of kill timestamps is now handled correctly, making the timeline view more informative
+* made the Pod image for kills with related pod kills clickable on the Battle Overview page
+
+
 
 #####Version 0.2.1 (2012/09/15)
 * release of version 0.2.1
