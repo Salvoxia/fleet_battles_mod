@@ -23,8 +23,12 @@
         <b><a href="{$i.plt_url}">{$i.name}</a>&nbsp;<a href="{$i.pod_url}">[Pod]</a></b><br/>{$i.ship}
       </td>
     {else}
-      <td class="kb-table-cell" style="background-image: url({$podpic}); background-repeat: no-repeat; background-position: right;">
-        <b><a href="{$i.pod_url}">{$i.name}</a></b><br/>{$i.ship}
+      <td class="kb-table-cell">
+          <div style="float: right;"><a href="{$i.pod_url}" ><img src="{$podpic}" width="32" height="32"></a></div>
+          <div style="position: absolute;"><b>
+            <a href="{$i.plt_url}">{$i.name}</a>
+            </b><br/>{$i.ship}
+          </div>
       </td>
     {/if}
     <td class="kb-table-cell" align="right">N°&nbsp;{$i.times}<br/>       
