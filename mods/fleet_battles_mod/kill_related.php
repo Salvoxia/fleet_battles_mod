@@ -580,10 +580,7 @@ class pKillRelatedFleetBattle extends pageAssembly
                         // gathering timeline data
                         // ---------------------------------------------------------------------------------------
                         $killTimestamp = strtotime($kill->getTimeStamp());
-                        // increase killtimestamp for pods so they appear AFTER the ship kill in the timeline
                         $shipClassId = $kill->getVictimShip()->getClass()->getID();
-                        if($shipClassId == 18 || $shipClassId == 2)
-                            $killTimestamp += 1;
                         $this->timeLine[] = array("timestamp" => strtotime($kill->getTimeStamp()), "loss" => array(
                             "victimName" => $kill->getVictimName(),
                             "victimID" => $kill->getVictimID(),

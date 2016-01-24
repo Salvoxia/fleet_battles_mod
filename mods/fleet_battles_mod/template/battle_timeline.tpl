@@ -40,7 +40,7 @@
         <td colspan="3"></td>
         {/if}
 
-    <td class="kb-table-cell" align="center">{$timelineEntry.timestamp|date_format:"%H:%M"}:00</td>
+    <td class="kb-table-cell" align="center">{$timelineEntry.timestamp|date_format:"%H:%M:%S"}</td>
 
     {if !is_null($timelineEntry.kill)}
             <td class="br-destroyed" width="32" height="32" style="max-width: 32px; width: 32px;">
