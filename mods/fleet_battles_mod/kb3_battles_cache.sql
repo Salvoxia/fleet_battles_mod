@@ -25,12 +25,16 @@ CREATE TABLE `kb3_battles_cache` (
   `start` datetime NOT NULL,
   `end` datetime NOT NULL,
   `ownersInvolved` int(10) NOT NULL,
+  `ownersInvolved` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY  (`battle_id`),
   KEY `start_end` (`end`,`start`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1
 
 
 
-ALTER TABLE `kb3_battles_cache`
-    ADD COLUMN `ownersInvolved` int(10) NOT NULL DEFAULT 0;
+CREATE TABLE `kb3_battles_owner_pilots` (
+    `battle_id` int unsigned NOT NULL,
+    `plt_id` int unsigned NOT NULL,
+    PRIMARY KEY (`battle_id`, `plt_id`)
+) ENGINE=InnoDB"
 

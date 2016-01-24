@@ -57,7 +57,7 @@ class KillListTable
                 $c++;
             }
 
-            $curdate = substr($kill->getTimeStamp(), 0, 10);
+            $curdate = substr($kill->getTimeStamp(), 0, 13);
             if ($curdate != $prevdate)
             {
                 if (count($kills) && $this->daybreak_)

@@ -24,6 +24,7 @@
         <input type="hidden" name="timestampStart" value="{$firstts}" />
         <input type="hidden" name="timestampEnd" value="{$lastts}" />
         <input type="hidden" name="numberOfInvolvedOwners" value="{$numberOfInvolvedOwners}" />
+        <input type="hidden" name="involvedOwners" value="{$involvedOwners}" />
         <hr/>
         <input type="submit" name="saveBattleSetup" value="save" />
         <input type="submit" name="deleteSideAssignments" value="reset" onclick="return confirm('Do you really want to delete all side assignments?')" />

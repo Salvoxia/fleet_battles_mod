@@ -85,6 +85,9 @@ if ($_POST['empty_table'])
 	$dbq = DBFactory::getDBQuery();
 	$empty_sql = 'TRUNCATE TABLE kb3_battles_cache;';
 	$dbq->execute($empty_sql);
+        
+        $empty_sql = 'TRUNCATE TABLE kb3_battles_owner_pilots;';
+	$dbq->execute($empty_sql);
 	$html .= "Cache table empty.";
 }
 
@@ -115,6 +118,17 @@ if ($_POST['create_table'])
   KEY `start_end` (`end`,`start`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1";
 		$dbq->execute($create_sql);
+                
+                $drop_sql = "DROP TABLE IF EXISTS kb3_battles_owner_pilots";
+		$dbq->execute($drop_sql);
+                
+                $create_sql = "CREATE TABLE `kb3_battles_owner_pilots` (
+                    `battle_id` int unsigned NOT NULL,
+                    `plt_id` int unsigned NOT NULL,
+                    PRIMARY KEY (`battle_id`, `plt_id`)
+                    )
+                    ENGINE=InnoDB";
+                $dbq->execute($create_sql);
 		$html .= "Cache table created, you can safely enable caching.";
 	}
 }
@@ -127,6 +141,9 @@ if ($_POST['drop_table'])
 	        $dbq = DBFactory::getDBQuery();
 	        $drop_sql = "DROP TABLE IF EXISTS kb3_battles_cache";
 	        $dbq->execute($drop_sql);
+                
+                $drop_sql = "DROP TABLE IF EXISTS kb3_battles_owner_pilots";
+		$dbq->execute($drop_sql);
 		$html .= "Cache table dropped.";
 	}
 }

@@ -83,6 +83,8 @@ class pKillRelatedFleetBattle extends pageAssembly
         protected $damageTotalHostile = 0;
         /** @var int */
         protected $numberOfInvolvedOwners = 0;
+        /** @var array */
+        protected $involvedOwners;
 	
 	function __construct()
 	{
@@ -279,7 +281,20 @@ class pKillRelatedFleetBattle extends pageAssembly
                     $this->firstts = array_shift($timestampsRaw);
                     $this->lastts = array_pop($timestampsRaw);
                 }
-
+                
+                // get parameters for overriding start and end times
+                // dirty hook for the enlightened circle ;)
+                $overrideStartTime = str_replace('%20', ' ', edkURI::getArg('starttime'));
+                $overrideEndTime = str_replace('%20', ' ', edkURI::getArg('endtime'));
+                if($overrideStartTime && strtotime($overrideStartTime))
+                {
+                    $this->firstts = $overrideStartTime;          
+                }
+                if($overrideEndTime && strtotime($overrideEndTime))
+                {
+                    $this->lastts = $overrideEndTime;
+                }
+                
                 // unfiltered kill list (no ship class filter applied)
 		$this->kslist = new KillList();
 		$this->kslist->setOrdered(true);
@@ -359,8 +374,12 @@ class pKillRelatedFleetBattle extends pageAssembly
                             {
                                 $this->kslist->addInvolvedAlliance($sideAssignment["entity_id"]);
                                 $this->lslist->addVictimAlliance($sideAssignment["entity_id"]);
+								// also add as involved alliance for blue-on-blue kills
+								$this->lslist->addInvolvedAlliance($sideAssignment["entity_id"]);
                                 $this->klist->addInvolvedAlliance($sideAssignment["entity_id"]);
                                 $this->llist->addVictimAlliance($sideAssignment["entity_id"]);
+								// also add as involved alliance for blue-on-blue kills
+								$this->llist->addInvolvedAlliance($sideAssignment["entity_id"]);
                             }
                         }
                         
@@ -381,8 +400,12 @@ class pKillRelatedFleetBattle extends pageAssembly
                             {
                                 $this->kslist->addInvolvedCorp($sideAssignment["entity_id"]);
                                 $this->lslist->addVictimCorp($sideAssignment["entity_id"]);
+								// also add as involved alliance for blue-on-blue kills
+								$this->lslist->addInvolvedCorp($sideAssignment["entity_id"]);
                                 $this->klist->addInvolvedCorp($sideAssignment["entity_id"]);
                                 $this->llist->addVictimCorp($sideAssignment["entity_id"]);
+								// also add as involved alliance for blue-on-blue kills
+								$this->llist->addInvolvedCorp($sideAssignment["entity_id"]);
                             }
                         }
                     }
@@ -578,7 +601,7 @@ class pKillRelatedFleetBattle extends pageAssembly
                             "killUrl" => edkURI::page("kill_detail", $kill->getID(), "kll_id")
                             ), "kill" => NULL);
 		}
-
+//echo "<pre>"; var_dump($this->pilots); echo "</pre>";
 		// sort pilot ships, order pods after ships
 		foreach ($this->pilots as $side => $pilot) {
 			foreach ($pilot as $id => $kll) {
@@ -607,7 +630,7 @@ class pKillRelatedFleetBattle extends pageAssembly
                                             if(isset($kll[$i]["damage"])) $this->damageTotalHostile += $kll[$i]["damage"];
                                         }
                                         
-					if ($kll[$i]['ship'] == 'Capsule') 
+					if ($kll[$i]['shipClass'] == 'Capsule') 
                                         {
 						if (isset($kll[$i - 1]['sid']) && isset($kll[$i]['destroyed'])) 
                                                 {
@@ -667,7 +690,7 @@ class pKillRelatedFleetBattle extends pageAssembly
 				}
 				$smarty->assign('system', implode(', ', $sysnames));
 			}
-		}
+                }
 		$smarty->assign('firstts', $this->firstts);
 		$smarty->assign('lastts', $this->lastts);
                 $smarty->assign("battleOverviewTableTemplate", $this->templateDir . "battle_overview_table.tpl");
@@ -932,7 +955,7 @@ class pKillRelatedFleetBattle extends pageAssembly
                             // now set up sides for BR Setup tab
                             // entity type: alliance
                                 
-                            if($pilota["alliance"] != "None")
+                            if(strcasecmp($pilota["alliance"], "None") != 0)
                             {
                                 $allianceName = addslashes($pilota["alliance"]);
                                 if(!isset($this->sides["a"][$pilota["alliance"]]))
@@ -999,7 +1022,7 @@ class pKillRelatedFleetBattle extends pageAssembly
 
                             // now set up sides for BR Setup tab
                             // entity type: alliance
-                            if($pilota["alliance"] != "None")
+                            if(strcasecmp($pilota["alliance"], "None") != 0)
                             {
                                 $allianceName = addslashes($pilota["alliance"]);
                                 if(!isset($this->sides["e"][$pilota["alliance"]]))
@@ -1043,6 +1066,11 @@ class pKillRelatedFleetBattle extends pageAssembly
             }
             
             $this->numberOfInvolvedOwners = count($involvedOwners);
+            foreach($involvedOwners AS $involvedOwnerId => $one)
+            {
+                $this->involvedOwners[] = $involvedOwnerId;
+            }
+ 
 
             // calculate percentages
             foreach($GoodAllies AS $name => &$info)
@@ -1109,7 +1137,7 @@ class pKillRelatedFleetBattle extends pageAssembly
             
             foreach($this->battlesToUpdate AS $battleId)
             {   
-                Battle::updateCacheForBattle($battleId, $killIsk, $lossIsk, $kills, $losses, $involved, $this->firstts, $this->lastts, $this->numberOfInvolvedOwners);
+                Battle::updateCacheForBattle($battleId, $killIsk, $lossIsk, $kills, $losses, $involved, $this->firstts, $this->lastts, $this->numberOfInvolvedOwners, $this->involvedOwners);
             }
 
         }
@@ -1130,6 +1158,8 @@ class pKillRelatedFleetBattle extends pageAssembly
             $smarty->assignByRef("sideHostile", $this->sides["e"]);
             $smarty->assign("systemIds", implode(",", $this->systems));
             $smarty->assign("numberOfInvolvedOwners", $this->numberOfInvolvedOwners);
+            if(!$this->invovledOwners) $this->involvedOwners = array();
+			$smarty->assign("involvedOwners", implode(",", $this->involvedOwners));
             
             return $smarty->fetch($this->templateDir."battle_setup.tpl");
         }
@@ -1886,6 +1916,8 @@ class pKillRelatedFleetBattle extends pageAssembly
             $timestampStart = $_POST["timestampStart"];
             $timestampEnd = $_POST["timestampEnd"];
             $this->numberOfInvolvedOwners = $_POST["numberOfInvolvedOwners"];
+            $this->involvedOwners = explode(",", $_POST["involvedOwners"]);
+           
             $systemIds = explode(",", $_POST["systemIds"]);
     
             // set side for each entity

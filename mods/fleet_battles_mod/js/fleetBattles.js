@@ -16,8 +16,26 @@ FleetBattles.loadTab = function(tabberArgs)
 { 
     var tabTitle = tabberArgs.tabber.tabs[tabberArgs.index].headingText.split(" ").join("")
     var tab = document.getElementById(tabTitle);
+    
+    // check for additional parameters
+    var additionalArguments = new Array();
+    
+    var startTime = $("#timestampStart").val();
+    if(startTime !== null)
+    {
+        additionalArguments.push("starttime="+startTime);
+    }
+    
+    var endTime = $("#timestampEnd").val();
+    
+    if(endTime !== null)
+    {
+        additionalArguments.push("endtime="+endTime);
+    }
+    
+    
     // tab empty?
-    if(tab != null && tab.innerHTML == "")
+    if(tab !== null && tab.innerHTML === "")
     {
         tab.innerHTML = "<div style=\"width: 100%; text-align: center\"><img src=\""+fleetBattlesLoadingImage+"\" /></div>";
         var ajaxRequestUrl = document.getElementById("ajaxRequestUrl").value;
@@ -29,6 +47,11 @@ FleetBattles.loadTab = function(tabberArgs)
         else
         {
             ajaxRequestUrl += "&"+tabTitle+"="+tabTitle;
+        }
+        
+        if(additionalArguments.length > 0)
+        {
+           ajaxRequestUrl +=  "&"+additionalArguments.join("&");
         }
         
         jQuery.get(ajaxRequestUrl, function(html){

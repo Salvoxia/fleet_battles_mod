@@ -19,7 +19,7 @@ class Battle
 		$this->ctr_ended_ = $battle['end'];
 		$this->executed_ = False;
                 
-                $this->ownersInvolved_ = $battle["ownersInvolved"];
+                $this->ownerPilotIdsInvolved_ = $battle["ownerPilotIds"];
 
 		$this->klist_ = new KillList();
 		$this->llist_ = new KillList();
@@ -124,8 +124,13 @@ class Battle
         
         function getNumberOfOwnersInvolved()
 	{
-		return $this->ownersInvolved_;
+		return count($this->ownerPilotIdsInvolved_);
 	}
+        
+        function getOwnersInvolved()
+        {
+            return $this->ownerPilotIdsInvolved_;
+        }
 
 	function getName()
 	{
@@ -244,9 +249,9 @@ class Battle
          * @param int $involved
          * @param String $timestampStart
          * @param String $timestampEnd 
-         * @param int $ownersInvolved
+         * @param int $numberOfOwnersInvolved
          */
-        public static function updateCacheForBattle($battleId, $killIsk, $lossIsk, $kills, $losses, $involved, $timestampStart, $timestampEnd, $ownersInvolved)
+        public static function updateCacheForBattle($battleId, $killIsk, $lossIsk, $kills, $losses, $involved, $timestampStart, $timestampEnd, $numberOfOwnersInvolved, $involvedOwnerIds)
         {
             $qry = DBFactory::getDBQuery();
             if($killIsk)
@@ -275,10 +280,26 @@ class Battle
                         involved = {$involved},
                         start = '{$timestampStart}',
                         end = '{$timestampEnd}',
-                        ownersInvolved = {$ownersInvolved}
+                        ownersInvolved = {$numberOfOwnersInvolved}
                      WHERE battle_id = {$battleId}";
                      
             $qry->execute($sql);
+            
+            // update involved owners
+            $sql = "DELETE FROM kb3_battles_owner_pilots
+                WHERE battle_id = {$battleId}";
+            $qry->execute($sql);
+            
+            // write involved owner pilots to special table
+            $sqlValues = array();
+            foreach($involvedOwnerIds AS $ownerPilotId)
+            {
+                $sqlValues[] = "({$battleId}, {$ownerPilotId})";
+            }
+
+            $sql = "REPLACE INTO kb3_battles_owner_pilots (battle_id, plt_id) VALUES ".implode(",", $sqlValues);
+            $qry->execute($sql);
+            
         }
         
         /**
@@ -288,6 +309,11 @@ class Battle
         public static function deleteBattleFromCache($battleId)
         {
             $qry = DBFactory::getDBQuery();
+            
+            $sql = "DELETE FROM kb3_battles_owner_pilots
+                        WHERE battle_id = {$battleId}";
+            $qry->execute($sql);
+            
             $sql = "DELETE FROM kb3_battles_cache
                         WHERE battle_id = {$battleId}";
             $qry->execute($sql);
@@ -455,7 +481,7 @@ class BattleList
                                                             
                                                             // count involved board owners ind.ind_plt_id AS pilotId, ind.ind_all_id AS allianceId, ind.ind_crp_id AS corpId
                                                             $involvedPilotsSql = "SELECT 
-                                                                    COUNT(*) AS numberOfInvolvedOwners 
+                                                                    pilotId
                                                                 FROM (
                                                                         (
                                                                             SELECT DISTINCT ind.ind_plt_id AS pilotId
@@ -480,15 +506,20 @@ class BattleList
                                                                 ) pilots";
 
                                                             $kllq->execute($involvedPilotsSql);
-                                                            $involvedOwners = $kllq->getRow();
-                                                            $numberOfInvolvedOwners = $involvedOwners["numberOfInvolvedOwners"];
+                                                            
+                                                            $involvedOwnerPilots = array();
+                                                            while($involvedOwner = $kllq->getRow())
+                                                            {
+                                                                $involvedOwnerPilots[] = $involvedOwner["pilotId"];
+                                                            }
+                                                            $numberOfInvolvedOwners = count($involvedOwnerPilots);
 
 								$system = new SolarSystem($s_row['kll_system_id']);
 								$_battle = array('id' => $k_row['kll_id'],
 									'system' => $system,
 									'start' => $k_row['kll_timestamp'],
 									'end' => $n_row['kll_timestamp'],
-                                                                        'ownersInvolved' =>$numberOfInvolvedOwners);
+                                                                        'ownerPilotIds' => $involvedOwnerPilots);
 								array_push($this->battles_,$_battle);
                                                                 $lastKillWasBattle = TRUE;
 							}
@@ -736,7 +767,7 @@ class BattleListTable
 			$battle = array_merge(array('name' => $contract->getName(), 'startdate' => $contract->getStartDate(), 'enddate' => $contract->getEndDate(),
 				'bar' => $bar->generate(), 'endtime' => date('H:i:s', strtotime($contract->getEndDate())),
 				'efficiency' => $efficiency, 'involved' => $contract->getInvolved(),
-				'kll_id' => $contract->getKillID(), 'id' => $contract->getID(), 'numberOfOwnersInvolved' => $contract->getNumberOfOwnersInvolved()), $kdata, $ldata);
+				'kll_id' => $contract->getKillID(), 'id' => $contract->getID(), 'numberOfOwnersInvolved' => $contract->getNumberOfOwnersInvolved(), 'ownerPilotIds' => $contract->getOwnersInvolved()), $kdata, $ldata);
                         
 			if (config::get('fleet_battles_mod_cache'))
 				$this->cacheBattle($battle);
@@ -789,17 +820,29 @@ class BattleListTable
 		$sql .= $battle['kll_id'].",".$battle['killisk'].",".$battle['lossisk'].",";
 		$sql .= $battle['efficiency'].",'".$battle['bar']."',";
 		$sql .= $battle['kills'].",".$battle['losses'].",".$battle['involved'].",'";
-		$sql .= $battle['name']."','".$battle['startdate']."','".$battle['enddate']."', ".$battle["numberOfOwnersInvolved"].")";
+		$sql .= $battle['name']."','".$battle['startdate']."','".$battle['enddate']."', ".count($battle["ownerPilotIds"]).")";
 
-		$cacheq = new DBQuery();
+		$cacheq = DBFactory::getDBQuery();
 		$cacheq->execute($sql);
+                $battleId = $cacheq->getInsertID();
+                
+                // write involved owner pilots to special table
+                $sqlValues = array();
+                foreach($battle["ownerPilotIds"] AS $ownerPilotId)
+                {
+                    $sqlValues[] = "({$battleId}, {$ownerPilotId})";
+                }
+                
+                $sql = "REPLACE INTO kb3_battles_owner_pilots (battle_id, plt_id) VALUES ".implode(",", $sqlValues);
+                $cacheq->execute($sql);
+                
 		return;
 	}
         
         /**
          * returns the filter arguments as SQL statements for concatenation in the WHERE clause 
          */
-        private function getFilterArgumentsWhereSql()
+        public function getFilterArgumentsWhereSql()
         {
             $query = DBFactory::getDBQuery();
             $filterTerms = array();

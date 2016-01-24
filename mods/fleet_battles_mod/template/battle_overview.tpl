@@ -1,4 +1,6 @@
 <div class="tabbertab tabbertabdefault" title="Battle Overview">
+    <input type="hidden" id="timestampStart" value="{$firstts}" />
+    <input type="hidden" id="timestampEnd" value="{$lastts}" />
     <div id="pilots_and_ships">
         <table border="0" width="100%" cellspacing="0" cellpadding="0">
             <tr><td width="49%" valign="top">
