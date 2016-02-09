@@ -1829,6 +1829,42 @@ class pKillRelatedFleetBattle extends pageAssembly
 
 		return $menubox->generate();
 	}
+	
+	/** 
+	 * adds meta tags for Twitter Summary Card and OpenGraph tags
+	 * to the HTML header
+	 */
+	function metaTags()
+	{
+
+		$referenceSystem = SolarSystem::getByID(reset($this->systems));
+		// meta tag: title
+		$metaTagTitle = $referenceSystem->getName() . " | " . $referenceSystem->getRegionName() . " | Battle Report";
+		$this->page->addHeader('<meta name="og:title" content="'.$metaTagTitle.'">');
+		$this->page->addHeader('<meta name="twitter:title" content="'.$metaTagTitle.'">');
+
+		// build description
+		$date = gmdate("Y-m-d", strtotime($this->firstts));
+		$startTime = gmdate("H:i", strtotime($this->firstts));
+		$endTime = gmdate("H:i", strtotime($this->lastts));
+		$totalIskDestroyedM = round(($this->summaryTable->getTotalKillISK() + $this->summaryTable->getTotalLossISK()) / 1000000, 2);
+		$metaTagDescription = "Battle Report for ".$referenceSystem->getName() . " (".$referenceSystem->getRegionName().") from ".$date." (".$startTime." - ".$endTime."): ";
+		$metaTagDescription .= "Involved Pilots: ".(count($this->pilots['a'])+count($this->pilots['e'])).", Total ISK destroyed: ".$totalIskDestroyedM."M ISK";
+
+		$this->page->addHeader('<meta name="description" content="'.$metaTagDescription.'">');
+		$this->page->addHeader('<meta name="og:description" content="'.$metaTagDescription.'">');
+			
+		// meta tag: image
+		$this->page->addHeader('<meta name="og:image" content="'.imageURL::getURL('Type', 3802, 64).'">');
+		$this->page->addHeader('<meta name="twitter:image" content="'.imageURL::getURL('Type', 3802, 64).'">');
+
+		$this->page->addHeader('<meta name="og:site_name" content="EDK - '.config::get('cfg_kbtitle').'">');
+		
+		// meta tag: URL
+		$this->page->addHeader('<meta name="og:url" content="'.edkURI::build(array('kll_id', $this->kll_id, true)).'">');
+		// meta tag: Twitter summary
+		$this->page->addHeader('<meta name="twitter:card" content="summary">');
+	}
 
 	/**
 	 * Add an item to the menu in standard box format.
@@ -2100,7 +2136,7 @@ else
     $killRelated->queue("handleSaveBattleSetup");
     $killRelated->queue("handleDeleteBattleSetup");
     $killRelated->queue("buildStats");
-
+	$killRelated->queue("metaTags");
     $killRelated->queue("summaryTable");
     
     // Battle in ....
