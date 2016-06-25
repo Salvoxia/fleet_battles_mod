@@ -611,48 +611,50 @@ class pKillRelatedFleetBattle extends pageAssembly
 		uasort($this->pilots['e'], array($this, 'cmp_func'));
 
 		// now get the pods out and mark the ships the've flown as podded
-		foreach ($this->pilots as $side => $pilot) {
-			foreach ($pilot as $id => $kll) {
+		foreach ($this->pilots as $side => $pilot) 
+		{
+			foreach ($pilot as $id => $kll) 
+			{
 				$max = count($kll);
 				for ($i = 0; $i < $max; $i++) 
-                                {
-                                        // add up total damage for each side
-                                        if($side == "a")
-                                        {
-                                            if(isset($kll[$i]["damage"])) $this->damageTotalFriendly += $kll[$i]["damage"];
-                                        }
+				{
+					// add up total damage for each side
+					if($side == "a")
+					{
+						if(isset($kll[$i]["damage"])) $this->damageTotalFriendly += $kll[$i]["damage"];
+					}
 
-                                        else
-                                        {
-                                            if(isset($kll[$i]["damage"])) $this->damageTotalHostile += $kll[$i]["damage"];
-                                        }
-                                        
+					else
+					{
+						if(isset($kll[$i]["damage"])) $this->damageTotalHostile += $kll[$i]["damage"];
+					}
+                    
+					// this kill has a pod as ship
 					if ($kll[$i]['shipClass'] == 'Capsule') 
-                                        {
-						if (isset($kll[$i - 1]['sid']) && isset($kll[$i]['destroyed'])) 
-                                                {
-							$this->pilots[$side][$id][$i - 1]['podded'] = true;
-							$this->pilots[$side][$id][$i - 1]['podid'] = $kll[$i]['kll_id'];
-                                                        $this->pilots[$side][$id][$i - 1]['pod_url'] = edkURI::page("kill_detail", $kll[$i]['kll_id'], "kll_id");
-							unset($this->pilots[$side][$id][$i]);
+					{
+						// this pilot made previous kills in another ship
+						if (isset($kll[$i - 1]['sid'])) 
+						{
+							// this kill is a pod loss
+							if(isset($kll[$i]['destroyed']))
+							{
+								$this->pilots[$side][$id][$i - 1]['podded'] = true;
+								$this->pilots[$side][$id][$i - 1]['podid'] = $kll[$i]['kll_id'];
+								$this->pilots[$side][$id][$i - 1]['pod_url'] = edkURI::page("kill_detail", $kll[$i]['kll_id'], "kll_id");
+
+								unset($this->pilots[$side][$id][$i]);
+							}
+							
+							// the pilot was involved in this kill, but flew a pod
+							else 
+							{
+								// update stats for previously used ship
+								$this->pilots[$side][$id][$i - 1]['times'] += $this->pilots[$side][$id][$i]['times'];
+								$this->pilots[$side][$id][$i - 1]['damage'] += $this->pilots[$side][$id][$i]['damage'];
+								unset($this->pilots[$side][$id][$i]);
+							}
 						} 
-                                                else
-                                                {
-                                                    // now sort out all pods from pilots who previously flown a real ship
-                                                    $valid_ship = false;
-                                                    foreach ($kll as $ship) 
-                                                    {
-                                                            if ($ship['ship'] != 'Capsule') 
-                                                            {
-                                                                    $valid_ship = true;
-                                                                    break;
-                                                            }
-                                                    }
-                                                    if ($valid_ship) 
-                                                    {
-                                                            unset($this->pilots[$side][$id][$i]);
-                                                    }
-						}
+						
 					}
 				}
 			}
