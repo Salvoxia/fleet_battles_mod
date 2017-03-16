@@ -71,7 +71,7 @@
         <td width="32" align="center"><img src="?a=thumb&amp;id={$k.fbplext}&amp;size=32" border="0" width="32" heigth="32"></td>
         
         <td width="200" class="kb-table-cell"><b>{$k.fb}</b><br>{$k.fbcorp|truncate:30}</td>
-        <td width="100" class="kb-table-cell" align="center"><b>{$k.system|truncate:10}</b><br/>({$k.systemsecurity|max:0|string_format:"%01.1f"})</td>
+        <td width="100" class="kb-table-cell" align="center"><b>{$k.system|truncate:10}</b><br/>(<span style="color:{if $k.systemsecurity >= 0.5}green{elseif $k.systemsecurity < 0.05}red{else}orange{/if};">{$k.systemsecurity|max:0|string_format:"%01.1f"}</span>)</td>
         {if $config->get('killlist_involved')}
             <td width="30" align="center" class="kb-table-cell"><b>{$k.inv}</b></td>
         {/if}
