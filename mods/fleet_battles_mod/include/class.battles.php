@@ -291,15 +291,16 @@ class Battle
             $qry->execute($sql);
             
             // write involved owner pilots to special table
-            $sqlValues = array();
-            foreach($involvedOwnerIds AS $ownerPilotId)
-            {
-                $sqlValues[] = "({$battleId}, {$ownerPilotId})";
-            }
-
-            $sql = "REPLACE INTO kb3_battles_owner_pilots (battle_id, plt_id) VALUES ".implode(",", $sqlValues);
-            $qry->execute($sql);
-            
+			if(isset($involvedOwnerIds) && is_array($involvedOwnerIds))
+			{
+				$sqlValues = array();
+				foreach($involvedOwnerIds AS $ownerPilotId)
+				{
+					$sqlValues[] = "({$battleId}, {$ownerPilotId})";
+				}
+				$sql = "REPLACE INTO kb3_battles_owner_pilots (battle_id, plt_id) VALUES ".implode(",", $sqlValues);
+				$qry->execute($sql);
+			}
         }
         
         /**

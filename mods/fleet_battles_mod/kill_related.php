@@ -1065,9 +1065,13 @@ class pKillRelatedFleetBattle extends pageAssembly
             }
             
             $this->numberOfInvolvedOwners = count($involvedOwners);
+			$this->involvedOwners = array();
             foreach($involvedOwners AS $involvedOwnerId => $one)
             {
-                $this->involvedOwners[] = $involvedOwnerId;
+				if(!in_array($involvedOwnerId, $this->involvedOwners))
+				{
+					$this->involvedOwners[] = $involvedOwnerId;
+				}
             }
  
 
@@ -1157,7 +1161,7 @@ class pKillRelatedFleetBattle extends pageAssembly
             $smarty->assignByRef("sideHostile", $this->sides["e"]);
             $smarty->assign("systemIds", implode(",", $this->systems));
             $smarty->assign("numberOfInvolvedOwners", $this->numberOfInvolvedOwners);
-            if(!$this->invovledOwners) $this->involvedOwners = array();
+            if(!$this->involvedOwners) $this->involvedOwners = array();
 			$smarty->assign("involvedOwners", implode(",", $this->involvedOwners));
             
             return $smarty->fetch($this->templateDir."battle_setup.tpl");
