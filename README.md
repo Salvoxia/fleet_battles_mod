@@ -7,6 +7,9 @@ Activate and configure the mod in ACP -> Modules.
 
 ##Changelog
 
+#####Version 0.2.3 (2017/06/05)
+* Fix: Kill Lists show kill system security status in the proper color
+* Fixed a problem with setting side assignments for cached battles
 
 #####Version 0.2.2 (2016/02/09)
 * release of version 0.2.2
