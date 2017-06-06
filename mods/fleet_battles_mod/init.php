@@ -1,5 +1,5 @@
 <?php
-define("FLEET_BATTLES_MOD_VERSION", "0.2.2");
+define("FLEET_BATTLES_MOD_VERSION", "0.2.3");
 
 $modInfo['fleet_battles_mod']['name'] = "Combined Fleet Battle Overview";
 $modInfo['fleet_battles_mod']['abstract'] = "Fleet battle overview and strongly enhanced related kills page (balance of power, battle overview, battle timeline, loss toplists, loot overview, JS tabs)";
